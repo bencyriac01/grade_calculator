@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Grade Calculator - Academic Performance Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js Library for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- html2pdf for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle-container">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode">
+            <span class="theme-icon">🌙</span>
+        </button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">📊</div>
+                <h1>GradeCalc</h1>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" data-section="dashboard">
+                    <span class="nav-icon">📈</span>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-section="sgpa">
+                    <span class="nav-icon">📝</span>
+                    <span>SGPA Calculator</span>
+                </button>
+                <button class="nav-item" data-section="cgpa">
+                    <span class="nav-icon">🎓</span>
+                    <span>CGPA Calculator</span>
+                </button>
+                <button class="nav-item" data-section="semester">
+                    <span class="nav-icon">📅</span>
+                    <span>Semester Tracker</span>
+                </button>
+                <button class="nav-item" data-section="analytics">
+                    <span class="nav-icon">📊</span>
+                    <span>Analytics</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-secondary" id="resetData">Reset All Data</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active">
+                <div class="section-header">
+                    <h2>Academic Dashboard</h2>
+                    <p>Welcome to your academic performance hub</p>
+                </div>
+
+                <!-- Student Profile Card -->
+                <div class="profile-section">
+                    <div class="profile-card glass-effect">
+                        <div class="profile-header">
+                            <div class="profile-avatar">👨‍🎓</div>
+                            <div class="profile-info">
+                                <input type="text" class="profile-input" id="studentName" placeholder="Enter your name">
+                                <input type="text" class="profile-input" id="studentRoll" placeholder="Roll No.">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card glass-effect">
+                            <div class="stat-icon">🎓</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Current CGPA</div>
+                                <div class="stat-value" id="dashboardCGPA">0.00</div>
+                                <div class="stat-progress">
+                                    <div class="progress-bar" id="cgpaProgress"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-effect">
+                            <div class="stat-icon">📚</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Credits Completed</div>
+                                <div class="stat-value" id="totalCredits">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-effect">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Semesters</div>
+                                <div class="stat-value" id="totalSemesters">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-effect">
+                            <div class="stat-icon">⭐</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Avg Semester SGPA</div>
+                                <div class="stat-value" id="avgSGPA">0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Summary -->
+                <div class="performance-section">
+                    <h3>Academic Performance Summary</h3>
+                    <div class="summary-grid">
+                        <div class="summary-card glass-effect">
+                            <h4>Highest Semester SGPA</h4>
+                            <div class="summary-value" id="highestSGPA">-</div>
+                        </div>
+                        <div class="summary-card glass-effect">
+                            <h4>Lowest Semester SGPA</h4>
+                            <div class="summary-value" id="lowestSGPA">-</div>
+                        </div>
+                        <div class="summary-card glass-effect">
+                            <h4>Current Status</h4>
+                            <div class="summary-value" id="academicStatus">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather Widget -->
+                <div class="weather-section">
+                    <div class="weather-widget glass-effect">
+                        <div class="weather-content" id="weatherContent">
+                            <div class="weather-loading">Loading weather...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Goal Tracking -->
+                <div class="goal-section">
+                    <h3>Academic Goal</h3>
+                    <div class="goal-card glass-effect">
+                        <input type="number" id="targetCGPA" min="0" max="10" step="0.01" placeholder="Target CGPA"
+                            value="8.5">
+                        <button class="btn-primary" id="updateGoal">Update Goal</button>
+                        <div class="goal-progress">
+                            <div class="goal-bar" id="goalProgressBar"></div>
+                            <div class="goal-text" id="goalText">Set a target to get started</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SGPA Calculator Section -->
+            <section id="sgpa" class="section">
+                <div class="section-header">
+                    <h2>SGPA Calculator</h2>
+                    <p>Calculate your semester grade point average</p>
+                </div>
+
+                <div class="calculator-container">
+                    <!-- Semester Selection -->
+                    <div class="semester-selector glass-effect">
+                        <label for="semesterSelect">Select Semester:</label>
+                        <select id="semesterSelect">
+                            <option value="">Create New Semester</option>
+                        </select>
+                        <button class="btn-primary" id="newSemesterBtn">+ New Semester</button>
+                    </div>
+
+                    <!-- Subject Input Form -->
+                    <div class="subject-input-form glass-effect">
+                        <h3>Add Subject</h3>
+                        <div class="form-group">
+                            <input type="text" id="subjectName" placeholder="Subject Name" class="form-input">
+                            <input type="number" id="subjectCredit" min="1" max="6" placeholder="Credits"
+                                class="form-input">
+                            <select id="subjectGrade" class="form-input">
+                                <option value="">Select Grade</option>
+                                <option value="10">A+ (10)</option>
+                                <option value="9">A (9)</option>
+                                <option value="8">B+ (8)</option>
+                                <option value="7">B (7)</option>
+                                <option value="6">C+ (6)</option>
+                                <option value="5">C (5)</option>
+                                <option value="4">D (4)</option>
+                                <option value="0">F (0)</option>
+                            </select>
+                            <button class="btn-primary" id="addSubjectBtn">Add Subject</button>
+                        </div>
+                    </div>
+
+                    <!-- Subjects List -->
+                    <div class="subjects-table glass-effect">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Subject Name</th>
+                                    <th>Credit</th>
+                                    <th>Grade</th>
+                                    <th>Grade Point</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subjectsTableBody">
+                                <tr class="empty-row">
+                                    <td colspan="5">No subjects added yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- SGPA Result -->
+                    <div class="sgpa-result glass-effect">
+                        <div class="result-card">
+                            <div class="result-label">Semester GPA (SGPA)</div>
+                            <div class="result-value" id="sgpaValue">0.00</div>
+                            <div class="result-subtitle" id="sgpaDetails">Add subjects to calculate</div>
+                        </div>
+                        <button class="btn-secondary" id="saveSemesterBtn">Save Semester</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CGPA Calculator Section -->
+            <section id="cgpa" class="section">
+                <div class="section-header">
+                    <h2>CGPA Calculator</h2>
+                    <p>Calculate your cumulative grade point average</p>
+                </div>
+
+                <div class="cgpa-container">
+                    <!-- Semesters CGPA Input -->
+                    <div class="semesters-cgpa glass-effect">
+                        <h3>Semester-wise SGPA</h3>
+                        <div id="semestersCGPAList"></div>
+                    </div>
+
+                    <!-- CGPA Result -->
+                    <div class="cgpa-result glass-effect">
+                        <div class="result-card">
+                            <div class="result-label">Cumulative GPA (CGPA)</div>
+                            <div class="result-value" id="cgpaValue">0.00</div>
+                            <div class="result-details">
+                                <div class="detail-item">
+                                    <span>Percentage (4.0 Scale):</span>
+                                    <span id="cgpaPercentage">0.00%</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span>Total Credits:</span>
+                                    <span id="totalCreditsDisplay">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CGPA Predictor -->
+                    <div class="cgpa-predictor glass-effect">
+                        <h3>CGPA Predictor</h3>
+                        <div class="predictor-inputs">
+                            <input type="number" id="predictedSGPA" min="0" max="10" step="0.01"
+                                placeholder="Predicted SGPA">
+                            <input type="number" id="predictedCredits" min="1" max="6" step="1"
+                                placeholder="Credits for next semester">
+                            <button class="btn-primary" id="predictCGPABtn">Predict CGPA</button>
+                        </div>
+                        <div id="predictorResult" class="predictor-result"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Semester Tracker Section -->
+            <section id="semester" class="section">
+                <div class="section-header">
+                    <h2>Semester Tracker</h2>
+                    <p>Track your academic progress across semesters</p>
+                </div>
+
+                <div class="tracker-container">
+                    <!-- Timeline View -->
+                    <div class="timeline-section glass-effect">
+                        <h3>Academic Timeline</h3>
+                        <div id="semesterTimeline" class="semester-timeline"></div>
+                    </div>
+
+                    <!-- Semester Cards -->
+                    <div class="semesters-grid" id="semesterCardsContainer">
+                    </div>
+
+                    <!-- Performance Comparison -->
+                    <div class="comparison-section glass-effect">
+                        <h3>Semester Performance Comparison</h3>
+                        <div class="comparison-grid">
+                            <div class="comparison-card">
+                                <div class="comp-label">Best Performing Semester</div>
+                                <div class="comp-value" id="bestSemester">-</div>
+                            </div>
+                            <div class="comparison-card">
+                                <div class="comp-label">Most Credits Completed</div>
+                                <div class="comp-value" id="mostCredits">-</div>
+                            </div>
+                            <div class="comparison-card">
+                                <div class="comp-label">Average Semester Duration</div>
+                                <div class="comp-value" id="avgDuration">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="section">
+                <div class="section-header">
+                    <h2>Analytics & Visualization</h2>
+                    <p>Visualize your academic performance trends</p>
+                </div>
+
+                <div class="analytics-container">
+                    <!-- CGPA Growth Chart -->
+                    <div class="chart-card glass-effect">
+                        <h3>CGPA Growth Trend</h3>
+                        <canvas id="cgpaGrowthChart"></canvas>
+                    </div>
+
+                    <!-- Semester Performance Chart -->
+                    <div class="chart-card glass-effect">
+                        <h3>Semester Performance</h3>
+                        <canvas id="semesterPerformanceChart"></canvas>
+                    </div>
+
+                    <!-- Credits Distribution -->
+                    <div class="chart-card glass-effect">
+                        <h3>Credits Distribution</h3>
+                        <canvas id="creditsDistributionChart"></canvas>
+                    </div>
+
+                    <!-- Grade Distribution -->
+                    <div class="chart-card glass-effect">
+                        <h3>Grade Distribution</h3>
+                        <canvas id="gradeDistributionChart"></canvas>
+                    </div>
+
+                    <!-- Export Options -->
+                    <div class="export-section glass-effect">
+                        <h3>Export Report</h3>
+                        <div class="export-buttons">
+                            <button class="btn-primary" id="exportPDFBtn">📥 Export as PDF</button>
+                            <button class="btn-secondary" id="exportJSONBtn">💾 Download Data</button>
+                            <button class="btn-secondary" id="importJSONBtn">📤 Import Data</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Loading Skeleton -->
+    <div id="loadingSkeleton" class="loading-skeleton hidden">
+        <div class="skeleton-box"></div>
+        <div class="skeleton-box"></div>
+        <div class="skeleton-box"></div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Hidden Import Input -->
+    <input type="file" id="importFileInput" style="display: none;" accept=".json">
+
+    <script src="script.js"></script>
+</body>
+
+</html>
